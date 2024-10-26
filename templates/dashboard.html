@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="text-center mb-4">Panel de Control</h2>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Sistema de Gestão</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Registrar
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="registerDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="showRegisterPatientForm()">Registrar Paciente</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="showRegisterExamForm()">Registrar Examen</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="consultDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Consultar
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="consultDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="showQueryPatientForm()">Consultar Paciente</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="showQueryExamForm()">Consultar Examen</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="editDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Editar
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="editDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="showEditPatientForm()">Editar Paciente</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="showEditExamForm()">Editar Examen</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="deleteDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Eliminar
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="deleteDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="showDeletePatientForm()">Eliminar Paciente</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="showDeleteExamForm()">Eliminar Examen</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div id="alertContainer" class="mb-3"></div>
+
+<div id="formContainer">
+    <div id="patientForm" class="form-section" style="display: none;">
+        <h3>Registrar Paciente</h3>
+        <form onsubmit="return registerPatient(event)">
+            <div class="mb-3">
+                <label for="patientName" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="patientName" required>
+            </div>
+            <div class="mb-3">
+                <label for="patientAge" class="form-label">Edad</label>
+                <input type="number" class="form-control" id="patientAge" required>
+            </div>
+            <div class="mb-3">
+                <label for="patientGender" class="form-label">Género</label>
+                <select class="form-select" id="patientGender" required>
+                    <option value="">Seleccione</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option value="O">Otro</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Registrar Paciente</button>
+        </form>
+    </div>
+
+    <div id="examForm" class="form-section" style="display: none;">
+        <h3>Registrar Examen</h3>
+        <form onsubmit="return registerExam(event)">
+            <div class="mb-3">
+                <label for="patientId" class="form-label">ID del Paciente</label>
+                <input type="number" class="form-control" id="patientId" required>
+            </div>
+            <div class="mb-3">
+                <label for="examType" class="form-label">Tipo de Examen</label>
+                <input type="text" class="form-control" id="examType" required>
+            </div>
+            <div class="mb-3">
+                <label for="examDate" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="examDate" required>
+            </div>
+            <div class="mb-3">
+                <label for="examResults" class="form-label">Resultados</label>
+                <input type="text" class="form-control" id="examResults" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Registrar Examen</button>
+        </form>
+    </div>
+
+    <div id="queryPatientForm" class="form-section" style="display: none;">
+        <h3>Consultar Paciente</h3>
+        <form onsubmit="return queryPatient(event)">
+            <div class="mb-3">
+                <label for="queryType" class="form-label">Consultar por</label>
+                <select class="form-select" id="queryType" onchange="toggleQueryField()">
+                    <option value="id">ID</option>
+                    <option value="name">Nombre</option>
+                </select>
+            </div>
+            <div class="mb-3" id="queryIdField">
+                <label for="queryPatientId" class="form-label">ID del Paciente</label>
+                <input type="number" class="form-control" id="queryPatientId">
+            </div>
+            <div class="mb-3" id="queryNameField" style="display: none;">
+                <label for="queryPatientName" class="form-label">Nombre del Paciente</label>
+                <input type="text" class="form-control" id="queryPatientName">
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar Paciente</button>
+        </form>
+    </div>
+
+    <div id="queryExamForm" class="form-section" style="display: none;">
+        <h3>Consultar Examen</h3>
+        <form onsubmit="return queryExam(event)">
+            <div class="mb-3">
+                <label for="queryExamType" class="form-label">Consultar por</label>
+                <select class="form-select" id="queryExamType" onchange="toggleExamQueryField()">
+                    <option value="id">ID del Examen</option>
+                    <option value="name">Nombre del Paciente</option>
+                </select>
+            </div>
+            <div class="mb-3" id="queryExamIdField">
+                <label for="queryExamId" class="form-label">ID del Examen</label>
+                <input type="number" class="form-control" id="queryExamId">
+            </div>
+            <div class="mb-3" id="queryExamNameField" style="display: none;">
+                <label for="queryExamPatientName" class="form-label">Nombre del Paciente</label>
+                <input type="text" class="form-control" id="queryExamPatientName">
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar Examen</button>
+        </form>
+    </div>
+
+    <div id="editPatientForm" class="form-section" style="display: none;">
+        <h3>Editar Paciente</h3>
+        <form onsubmit="return editPatient(event)">
+            <div class="mb-3">
+                <label for="editQueryType" class="form-label">Editar por</label>
+                <select class="form-select" id="editQueryType" onchange="toggleEditQueryField()">
+                    <option value="id">ID</option>
+                    <option value="name">Nome</option>
+                </select>
+            </div>
+            <div class="mb-3" id="editIdField">
+                <label for="editPatientId" class="form-label">ID do Paciente</label>
+                <input type="number" class="form-control" id="editPatientId">
+            </div>
+            <div class="mb-3" id="editNameField" style="display: none;">
+                <label for="editPatientName" class="form-label">Nome do Paciente</label>
+                <input type="text" class="form-control" id="editPatientName">
+            </div>
+            <div class="mb-3">
+                <label for="editPatientNewName" class="form-label">Novo Nome</label>
+                <input type="text" class="form-control" id="editPatientNewName" required>
+            </div>
+            <div class="mb-3">
+                <label for="editPatientAge" class="form-label">Idade</label>
+                <input type="number" class="form-control" id="editPatientAge" required>
+            </div>
+            <div class="mb-3">
+                <label for="editPatientGender" class="form-label">Gênero</label>
+                <select class="form-select" id="editPatientGender" required>
+                    <option value="">Selecione</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Feminino</option>
+                    <option value="O">Outro</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Editar Paciente</button>
+        </form>
+    </div>
+
+    <div id="deletePatientForm" class="form-section" style="display: none;">
+        <h3>Deletar Paciente</h3>
+        <form onsubmit="return deletePatient(event)">
+            <div class="mb-3">
+                <label for="deletePatientId" class="form-label">ID do Paciente</label>
+                <input type="number" class="form-control" id="deletePatientId" required>
+            </div>
+            <button type="submit" class="btn btn-danger">Deletar Paciente</button>
+        </form>
+    </div>
+
+    <div id="editExamForm" class="form-section" style="display: none;">
+        <h3>Editar Exame</h3>
+        <form onsubmit="return editExam(event)">
+            <div class="mb-3">
+                <label for="editExamId" class="form-label">ID do Exame</label>
+                <input type="number" class="form-control" id="editExamId" required>
+            </div>
+            <div class="mb-3">
+                <label for="editExamType" class="form-label">Tipo de Exame</label>
+                <input type="text" class="form-control" id="editExamType" required>
+            </div>
+            <div class="mb-3">
+                <label for="editExamDate" class="form-label">Data</label>
+                <input type="date" class="form-control" id="editExamDate" required>
+            </div>
+            <div class="mb-3">
+                <label for="editExamResults" class="form-label">Resultados</label>
+                <input type="text" class="form-control" id="editExamResults" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Editar Exame</button>
+        </form>
+    </div>
+
+    <div id="deleteExamForm" class="form-section" style="display: none;">
+        <h3>Deletar Exame</h3>
+        <form onsubmit="return deleteExam(event)">
+            <div class="mb-3">
+                <label for="deleteExamId" class="form-label">ID do Exame</label>
+                <input type="number" class="form-control" id="deleteExamId" required>
+            </div>
+            <button type="submit" class="btn btn-danger">Deletar Exame</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function showForm(formId) {
+    document.querySelectorAll('.form-section').forEach(form => {
+        form.style.display = 'none';
+    });
+    document.getElementById(formId).style.display = 'block';
+}
+
+function showAlert(message, type) {
+    const alertContainer = document.getElementById('alertContainer');
+    alertContainer.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+}
+
+function registerPatient(event) {
+    event.preventDefault();
+    const data = {
+        name: document.getElementById('patientName').value,
+        age: document.getElementById('patientAge').value,
+        gender: document.getElementById('patientGender').value
+    };
+    fetch('/api/patient/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert(data.message, 'success');
+        event.target.reset();
+    })
+    .catch(error => {
+        showAlert('Error al registrar paciente', 'danger');
+    });
+    return false;
+}
+
+function registerExam(event) {
+    event.preventDefault();
+    const data = {
+        patient_id: document.getElementById('patientId').value,
+        exam_type: document.getElementById('examType').value,
+        date: document.getElementById('examDate').value,
+        results: document.getElementById('examResults').value
+    };
+    fetch('/api/exam/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert(data.message, 'success');
+        event.target.reset();
+    })
+    .catch(error => {
+        showAlert('Error al registrar examen', 'danger');
+    });
+    return false;
+}
+
+function queryPatient(event) {
+    event.preventDefault();
+    const queryType = document.getElementById('queryType').value;
+    const queryValue = queryType === 'id' ? document.getElementById('queryPatientId').value : document.getElementById('queryPatientName').value;
+    fetch(`/api/patient/query?type=${queryType}&value=${queryValue}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            showAlert(data.message, 'warning');
+        } else {
+            const exams = data.exams.length > 0 ? data.exams.join(', ') : 'Ningún examen registrado';
+            const patientInfo = `
+                ID: ${data.id}<br>
+                Nombre: ${data.name}<br>
+                Edad: ${data.age}<br>
+                Género: ${data.gender}<br>
+                Exámenes: ${exams}
+            `;
+            showAlert(patientInfo, 'success');
+        }
+    })
+    .catch(error => {
+        showAlert('Error al consultar paciente', 'danger');
+    });
+    return false;
+}
+
+function queryExam(event) {
+    event.preventDefault();
+    const queryType = document.getElementById('queryExamType').value;
+    const queryValue = queryType === 'id' ? document.getElementById('queryExamId').value : document.getElementById('queryExamPatientName').value;
+    fetch(`/api/exam/query?type=${queryType}&value=${queryValue}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            showAlert(data.message, 'warning');
+        } else {
+            let examInfo = '';
+            if (Array.isArray(data)) {
+                data.forEach(exam => {
+                    examInfo += `
+                        ID del paciente: ${exam.patient_id}<br>
+                        Nombre del paciente: ${exam.patient_name}<br>
+                        Nombre del Examen: ${exam.exam_type}<br>
+                        Fecha: ${exam.date}<br>
+                        Resultado: ${exam.results}<br>
+                    `;
+                });
+            } else {
+                examInfo = `
+                    ID del paciente: ${data.patient_id}<br>
+                    Nombre del paciente: ${data.patient_name}<br>
+                    Nombre del Examen: ${data.exam_type}<br>
+                    Fecha: ${data.date}<br>
+                    Resultado: ${data.results}
+                `;
+            }
+            showAlert(examInfo, 'success');
+        }
+    })
+    .catch(error => {
+        showAlert('Error al consultar examen', 'danger');
+    });
+    return false;
+}
+
+function toggleQueryField() {
+    const queryType = document.getElementById('queryType').value;
+    document.getElementById('queryIdField').style.display = queryType === 'id' ? 'block' : 'none';
+    document.getElementById('queryNameField').style.display = queryType === 'name' ? 'block' : 'none';
+}
+
+function toggleExamQueryField() {
+    const queryType = document.getElementById('queryExamType').value;
+    document.getElementById('queryExamIdField').style.display = queryType === 'id' ? 'block' : 'none';
+    document.getElementById('queryExamNameField').style.display = queryType === 'name' ? 'block' : 'none';
+}
+
+function showEditPatientForm() {
+    showForm('editPatientForm');
+}
+
+function showEditExamForm() {
+    showForm('editExamForm');
+}
+
+function showDeletePatientForm() {
+    showForm('deletePatientForm');
+}
+
+function showDeleteExamForm() {
+    showForm('deleteExamForm');
+}
+
+function editPatient(event) {
+    event.preventDefault();
+    const patientId = document.getElementById('editPatientId').value;
+    const data = {
+        name: document.getElementById('editPatientName').value,
+        age: document.getElementById('editPatientAge').value,
+        gender: document.getElementById('editPatientGender').value
+    };
+    fetch(`/api/patient/edit/${patientId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert(data.message, 'success');
+        event.target.reset();
+    })
+    .catch(error => {
+        showAlert('Erro ao editar paciente', 'danger');
+    });
+    return false;
+}
+
+function deletePatient(event) {
+    event.preventDefault();
+    const patientId = document.getElementById('deletePatientId').value;
+    fetch(`/api/patient/delete/${patientId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert(data.message, 'success');
+        event.target.reset();
+    })
+    .catch(error => {
+        showAlert('Erro ao deletar paciente', 'danger');
+    });
+    return false;
+}
+
+function editExam(event) {
+    event.preventDefault();
+    const examId = document.getElementById('editExamId').value;
+    const data = {
+        exam_type: document.getElementById('editExamType').value,
+        date: document.getElementById('editExamDate').value,
+        results: document.getElementById('editExamResults').value
+    };
+    fetch(`/api/exam/edit/${examId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert(data.message, 'success');
+        event.target.reset();
+    })
+    .catch(error => {
+        showAlert('Erro ao editar exame', 'danger');
+    });
+    return false;
+}
+
+function deleteExam(event) {
+    event.preventDefault();
+    const examId = document.getElementById('deleteExamId').value;
+    fetch(`/api/exam/delete/${examId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert(data.message, 'success');
+        event.target.reset();
+    })
+    .catch(error => {
+        showAlert('Erro ao deletar exame', 'danger');
+    });
+    return false;
+}
+
+function toggleEditQueryField() {
+    const editQueryType = document.getElementById('editQueryType').value;
+    document.getElementById('editIdField').style.display = editQueryType === 'id' ? 'block' : 'none';
+    document.getElementById('editNameField').style.display = editQueryType === 'name' ? 'block' : 'none';
+}
+</script>
+{% endblock %}
